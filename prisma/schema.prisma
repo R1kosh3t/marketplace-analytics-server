@@ -1,0 +1,64 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               String   @id @default(uuid())
+  email            String   @unique
+  passwordHash     String
+  licenseAccepted  Boolean  @default(false)
+  licenseVersion   String?
+  licenseAcceptedAt DateTime?
+  createdAt        DateTime @default(now())
+
+  marketplaceAccounts UserMarketplaceAccount[]
+  // поле orders убрано, заказы доступны через marketplaceAccounts -> orders
+}
+
+model Marketplace {
+  id   String @id @default(uuid())
+  name String @unique
+  url  String
+
+  accounts UserMarketplaceAccount[]
+}
+
+model UserMarketplaceAccount {
+  id            String      @id @default(uuid())
+  userId        String
+  marketplaceId String
+  externalId    String?
+  user          User        @relation(fields: [userId], references: [id])
+  marketplace   Marketplace @relation(fields: [marketplaceId], references: [id])
+  orders        Order[]     // без @relation(onDelete: Cascade)
+  @@unique([userId, marketplaceId])
+}
+
+model Order {
+  id                   String   @id @default(uuid())
+  externalOrderId      String
+  orderDate            DateTime
+  totalAmount          Float
+  currency             String   @default("BYN")
+  status               String?
+  marketplaceAccountId String
+  account              UserMarketplaceAccount @relation(fields: [marketplaceAccountId], references: [id], onDelete: Cascade)
+  items                OrderItem[]
+  @@unique([marketplaceAccountId, externalOrderId])
+}
+
+model OrderItem {
+  id       String  @id @default(uuid())
+  orderId  String
+  name     String
+  price    Float
+  quantity Int     @default(1)
+  category String?
+
+  order Order @relation(fields: [orderId], references: [id])
+}
