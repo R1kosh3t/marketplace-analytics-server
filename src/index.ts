@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 
 // CORS разрешает запросы с расширения и localhost
 app.use(cors({
-  origin: ['chrome-extension://*', 'http://localhost:3000'],
+  origin: ['chrome-extension://*', 'https://marketplace-analytics-server.onrender.com'],
   credentials: true
 }));
 
