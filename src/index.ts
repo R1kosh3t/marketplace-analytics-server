@@ -9,6 +9,8 @@ import cartRoutes from './routes/cart';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.set('trust proxy', 1);
+
 // CORS разрешает запросы с расширения и localhost
 app.use(cors({
   origin: ['chrome-extension://*', 'https://marketplace-analytics-server.onrender.com'],
