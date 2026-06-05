@@ -43,7 +43,10 @@ async function ensureMarketplaces() {
 
 async function start() {
   // Включаем каскадное удаление в SQLite
-  await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON');
+  // Включаем поддержку внешних ключей только для SQLite
+    if (process.env.DATABASE_URL?.startsWith('file:')) {
+      await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON');
+    }
   console.log('Внешние ключи включены');
 
   await ensureMarketplaces();
